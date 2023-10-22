@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <string>
+#include <map>
 
 using namespace std;
 bool isValidinput(char c)
@@ -54,12 +55,37 @@ string check(const string& expression)
         return "enter valid input";
 }
 
+void separator(string s) {
+
+}
+
+
+// Function to count how many literals do we have.
+int count_variables(string s) {
+    int num_of_variables;
+
+    return num_of_variables;
+}
+
+void truth_table_generator(string s) {
+    
+    map<char, int>indx;
+    int num_of_variables = 2;// = count_variables(s)
+    for (int i = 0; i < num_of_variables; i++) {
+        indx[] = i;
+    }
+}
+
 int main()
 {
     string expression;
     cout << "Enter the boolean function: " << '\n';
     cin >> expression;
-    cout << check(expression);
+    expression = "ab";
+    //cout << check(expression);
+    cout << char(97);
+    cout << expression;
+    
 
     return 0;
 }
