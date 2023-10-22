@@ -1,13 +1,5 @@
-//
-//  main.cpp
-//  Digital-project
-//
-//  Created by Amal Fouda on 21/10/2023.
-//
-
 #include <iostream>
 #include <string>
-
 
 using namespace std;
 bool isValid(char c)
@@ -17,8 +9,10 @@ bool isValid(char c)
         return false;
     return true;
 }
-bool check_Sop(string str) {
-    bool plus_sign = false;
+bool checkSOP(string str) {
+
+    //amal's inital code 
+    /*bool plus_sign = false;
     bool last_plussign=false; //to check if there is pus sign at the end
 
     for (int i=0;i<str.length();i++) {
@@ -39,14 +33,48 @@ bool check_Sop(string str) {
         
     }
 
-    return plus_sign && !last_plussign;
+    return plus_sign && !last_plussign;*/
+
+        //nours updated code (try it out ya gama3a garabo el cases kolaha 
+    bool plus_sign = false; // to check if theres a + 
+    bool last_char_was_plus = false; // to check we have no two consecutive '+'
+    bool last_char_was_complement = false; // Ensures no two consecutive inversions
+
+    for (int i = 0; i < str.length(); i++)//iterating through the expression string
+    {
+        char c = str[i];
+
+        if (c == '+') 
+        {
+            if (i == 0 || i == str.length() - 1 || last_char_was_plus) //if we are at the beginning or end and we have a +
+                return false; // its invalid 
+            
+            plus_sign = true; //after checking we dont have + at the beginning or end we change this variable to true 
+            last_char_was_plus = true; //and this variable 
+            last_char_was_complement = false; // reset after encountering '+'
+        }
+        else if (c == '\'') //if we have the inversion '
+        {
+            if (last_char_was_complement || last_char_was_plus)//to check we dont have consecutive inversion after + between literals
+                return false; // its invalid
+           
+            last_char_was_complement = true; 
+            last_char_was_plus = false; // reset after encountering a valid character
+        }
+        else if (isValid(c)) {
+            last_char_was_plus = false; // reset after encountering a valid character
+            last_char_was_complement = false; // reset after encountering a valid character
+        }
+        else return false; //its invalid
+        
+    }
+    return plus_sign;
 }
+
 bool checkPOS(const string& expression)
 {
     //if (expression.find('+') == string::npos || expression.find('(') != string::npos) //checks if there's no '+' or if there's an opening parenthesis
     //    return expression.find(')') != string::npos;
-
-
     int pos = 0;
     int len = expression.length();
 
@@ -56,20 +84,29 @@ bool checkPOS(const string& expression)
 
         pos += 2; // increment to see the character after the ( and the first literal
 
-        while (pos < len && expression[pos] == '+' && isalpha(expression[pos + 1])) //keep reading while we have "+letter" pattern
+        if (pos < len && expression[pos] == '\'') 
+            pos++;
+
+        while (pos < len && expression[pos] == '+' && isalpha(expression[pos + 1]))  // Keep reading while we have "+letter" 
+        {
             pos += 2; // move past the '+' and the letter
-        
-        if (pos >= len || expression[pos] != ')')//has to end in ) after we finish the first ()
+
+            //check for inversion '
+            if (pos < len && expression[pos] == '\'') 
+                pos++;
+            
+        }
+        if (pos >= len || expression[pos] != ')')//check for closing )
             return false;
 
-        pos++; // move past the ')' and check the next ()
-    }
-
+        pos++; // move past the ')'
+    }   
     return true;
 }
+
 string check(const string& expression)
 {
-    if (check_Sop(expression))
+    if (checkSOP(expression))
         return "SOP";
     else if (checkPOS(expression))
         return "POS";
