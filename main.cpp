@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <map>
 
 using namespace std;
 bool isValid(char c)
@@ -117,11 +118,6 @@ string check(const string& expression)
     
 }
 
-
-
-
-
-
 void separator(string s) {
 
 }
@@ -193,6 +189,28 @@ void truth_table_generator(string s) {
 
 }
 
+int countOnes(const string &binaryLiteral) //first step of the implicaton table: to see how many 1's are in each literal 
+{
+    int counter = 0; 
+    for (char c : binaryLiteral)
+    {
+        if (c == 1)
+            counter++;
+        
+        return counter;
+    }
+}
+
+int findGroup(string s)//second step is to group the literals with the name number of 1's 
+{
+   
+}
+
+//third: we need to check for grey code - adjacent literals - start comparing 
+//four: we need to replace the different bits with -
+//five: if they are equal, ignore
+//six: see if which PI's we did not use and print them 
+ 
 int main()
 {
     string expression;
