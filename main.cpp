@@ -226,6 +226,10 @@ vector<char> NumberOfLiterals(string str) {
 void truth_table_generator(string s) {
 
     map<char, int>indx;
+    map<int, vector<bool>>minterms;
+    map<int, vector<bool>>maxterms;
+    string can_SOP = "";
+    string can_POS = "";
     vector<char> literals = NumberOfLiterals(s);
     vector<bool> values;  // vector to contain all the temporary values that I will give to the literals
     //creating the indexing map
@@ -239,11 +243,78 @@ void truth_table_generator(string s) {
 
     for (int i = 0; i < pow(2, literals.size()); i++) {   //i<(2*num_of_varialbes)
         values = dec_to_bin(i, literals.size());
+
+        //##### displaying the truth table ######
         for (int j = 0; j < values.size(); j++) {
             cout << values[j] << " | ";
         }
         cout << calculate_function_SOP(values, s, indx) << endl;
+
+
+        //##### Selecting minterms and maxterms ######
+        if (calculate_function_SOP(values, s, indx))
+            minterms[i] = values;
+        else
+            maxterms[i] = values;
     }
+
+    cout << "\n\nMin\n";
+    for (auto i = minterms.begin(); i != minterms.end(); i++) {
+        cout << i->first << " - ";
+        for (int j = 0; j < i->second.size(); j++)
+            cout << i->second[j];
+        cout << endl;
+    }
+
+
+    //##### Canonical SOP ######
+    cout << "\Canonical SOP:  ";
+    for (auto i = minterms.begin(); i != minterms.end(); i++) {
+        for (int j = 0; j < i->second.size(); j++)
+            if (i->second[j]) {
+                can_SOP += literals[j];
+            }
+            else {
+                can_SOP += literals[j];
+                can_SOP += '\'';
+            }
+
+        can_SOP += '+';
+    }
+    can_SOP.pop_back();
+    cout << can_SOP << endl;
+
+
+
+
+    cout << "Max\n";
+    for (auto i = maxterms.begin(); i != maxterms.end(); i++) {
+        cout << i->first << " - ";
+        for (int j = 0; j < i->second.size(); j++)
+            cout << i->second[j];
+        cout << endl;
+    }
+
+    //##### Canonical POS ######
+    cout << "\Canonical POS:  ";
+    for (auto i = maxterms.begin(); i != maxterms.end(); i++) {
+        can_POS += '(';
+        for (int j = 0; j < i->second.size(); j++)
+        {
+            if (i->second[j]) {
+                can_POS += literals[j];
+                can_POS += '\'';
+            }
+            else {
+                can_POS += literals[j];
+            }
+            can_POS += '+';
+        }
+        can_POS.pop_back();
+        can_POS += ')';
+    }
+
+    cout << can_POS << endl;
 
 }
 
@@ -275,7 +346,7 @@ int findGroup(string s)//second step is to group the literals with the name numb
 int main()
 {
     string expression;
-    expression = "ab'+ab+c";
+    expression = "ac'+ab";
     ////cout << check(expression);
 
     truth_table_generator(expression);
