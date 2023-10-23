@@ -156,18 +156,89 @@ void truth_table_generator(string s) {
 
 }
 
+vector<string> separator(string s) {
+    vector<string> terms;
+    string term = "";
+    for (int i = 0; i < s.size(); i++)
+    {
+        if (s[i] == '+') {
+            terms.push_back(term);
+            term = "";
+        }
+        else {
+            term += s[i];
+        }
+    }
+    terms.push_back(term);
+
+    return terms;
+}
+
+
+bool calculate_expression(bool values[], string term, map<char, int>indx) {    //bcd
+    bool anding = 1;
+    for (int i = 0; i < term.size(); i++) {
+        cout << term[i];
+        if (i + 1 < term.size() && term[i + 1] == '\'') {
+            anding = (anding && !(values[indx[term[i]]]));
+            i++;
+        }
+        else {
+            anding = (anding && values[indx[term[i]]]);
+            cout << anding << endl;
+        }
+
+    }
+    return anding;
+}
+
+
+
+bool calculate_function(bool values[], string s, map<char, int>indx)
+{
+    bool res = 0;
+
+    vector<string> terms;
+
+    // if(check_PoS(s)){ //ab+bc
+
+    // }else{ //SoP
+
+    // }
+
+    //assume it is SoP:----
+
+    terms = separator(s);
+    for (int i = 0; i < terms.size(); i++) {
+        res = (res || calculate_expression(values, terms[i], indx));
+    }
+
+    return res;
+}
+
+
 int main()
 {
-    string expression;
-    //cout << "Enter the boolean function: " << '\n';
-    //cin >> expression;
-    expression = "ab";
-    //cout << check(expression);
+    //string expression;
+    ////cout << "Enter the boolean function: " << '\n';
+    ////cin >> expression;
+    //expression = "ab";
+    ////cout << check(expression);
 
 
-    truth_table_generator(expression);
+    //truth_table_generator(expression);
 
-    //bool* binary_values = dec_to_bin(3, 5);
+    ////bool* binary_values = dec_to_bin(3, 5);
+
+    bool values[3] = { 0,1,1 };
+    string s = "ab+bc+ab'";
+    map<char, int>k;
+    k['a'] = 0;
+    k['b'] = 1;
+    k['c'] = 2;
+
+    cout<<calculate_function(values,s,k);
+    cout << calculate_expression(values, "a'bc", k);
 
 
     return 0;
