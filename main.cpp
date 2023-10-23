@@ -7,6 +7,8 @@
 
 #include <iostream>
 #include <string>
+#include <map>
+#include <vector>
 
 
 using namespace std;
@@ -17,29 +19,64 @@ bool isValid(char c)
         return false;
     return true;
 }
-bool check_Sop(string str) {
-    bool plus_sign = false;
-    bool last_plussign=false; //to check if there is pus sign at the end
+bool checkSOP(string str) {
+    // bool plus_sign = false;
+    // bool last_plussign=false; //to check if there is pus sign at the end
 
-    for (int i=0;i<str.length();i++) {
-        char c=str[i];
-        if (c == '+') {
-            if(i==0 || i==str.length()-1)
-            {
-                last_plussign=true;
-                return false;
-            }
-            plus_sign = true;
+    // for (int i=0;i<str.length();i++) {
+    //     char c=str[i];
+    //     if (c == '+') {
+    //         if(i==0 || i==str.length()-1)
+    //         {
+    //             last_plussign=true;
+    //             return false;
+    //         }
+    //         plus_sign = true;
             
-        } else if (c == '(') {
-            return false; // Contains '('
-        } else if (!isValid(c)) {
-            return false; // Invalid character
+    //     } else if (c == '(') {
+    //         return false; // Contains '('
+    //     } else if (!isValid(c)) {
+    //         return false; // Invalid character
+    //     }
+        
+    // }
+
+    // return plus_sign && !last_plussign;
+
+        //nours updated code (try it out ya gama3a garabo el cases kolaha) 
+    bool plus_sign = false; // to check if theres a + 
+    bool last_char_was_plus = false; // to check we have no two consecutive '+'
+    bool last_char_was_complement = false; // Ensures no two consecutive inversions
+
+    for (int i = 0; i < str.length(); i++)//iterating through the expression string
+    {
+        char c = str[i];
+
+        if (c == '+') 
+        {
+            if (i == 0 || i == str.length() - 1 || last_char_was_plus) //if we are at the beginning or end and we have a +
+                return false; // its invalid 
+            
+            plus_sign = true; //after checking we dont have + at the beginning or end we change this variable to true 
+            last_char_was_plus = true; //and this variable 
+            last_char_was_complement = false; // reset after encountering '+'
         }
+        else if (c == '\'') //if we have the inversion '
+        {
+            if (last_char_was_complement || last_char_was_plus)//to check we dont have consecutive inversion after + between literals
+                return false; // its invalid
+           
+            last_char_was_complement = true; 
+            last_char_was_plus = false; // reset after encountering a valid character
+        }
+        else if (isValid(c)) {
+            last_char_was_plus = false; // reset after encountering a valid character
+            last_char_was_complement = false; // reset after encountering a valid character
+        }
+        else return false; //its invalid
         
     }
-
-    return plus_sign && !last_plussign;
+    return plus_sign;
 }
 bool checkPOS(const string& expression)
 {
@@ -69,7 +106,7 @@ bool checkPOS(const string& expression)
 }
 string check(const string& expression)
 {
-    if (check_Sop(expression))
+    if (checkSOP(expression))
         return "SOP";
     else if (checkPOS(expression))
         return "POS";
@@ -200,7 +237,7 @@ bool calculate_function(bool values[], string s, map<char, int>indx)
 
     vector<string> terms;
 
-    // if(check_PoS(s)){ //ab+bc
+    // if(checkPOS(s)){ //ab+bc
 
     // }else{ //SoP
 
