@@ -114,11 +114,11 @@ string check(const string& expression)
 
 
 
-void display(vector<bool> k) {
-    for (int i = 0; i < k.size(); i++) {
-        cout << k[i] << ",";
-    }
-}
+//void display( vector<bool> k) {
+//    for (int i = 0; i < k.size(); i++) {
+//        cout << k[i] << ",";
+//    }
+//}
 
 // Function to count how many literals do we have.
 int count_variables(string s) {
@@ -170,6 +170,23 @@ vector<string> separator_SOP(string s) {
     return terms;
 }
 
+vector<string> separator_POS(string s) {   //(a+b')(c)
+    vector<string> terms;
+    string term = "";
+    for (int i = 0; i < s.size(); i++)
+    {
+        if (s[i] != '(' && s[i] != '+') {
+            if (s[i] == ')') {
+                terms.push_back(term);
+                term = "";
+            }
+            else
+                term += s[i];
+        }
+    }
+    return terms;
+}
+
 bool calculate_expression_SOP(vector<bool> values, string term, map<char, int>indx) {    //bcd
     bool anding = 1;
     for (int i = 0; i < term.size(); i++) {
@@ -184,22 +201,43 @@ bool calculate_expression_SOP(vector<bool> values, string term, map<char, int>in
     return anding;
 }
 
-bool calculate_function_SOP(vector<bool> values, string s, map<char, int>indx)
+bool calculate_expression_POS(vector<bool> values, string term, map<char, int>indx) {    //bc'd
+    bool oring = 0;
+    for (int i = 0; i < term.size(); i++) {
+        if (i + 1 < term.size() && term[i + 1] == '\'') {
+            oring = (oring || !(values[indx[term[i]]]));
+            i++;
+        }
+        else {
+            oring = (oring || values[indx[term[i]]]);
+        }
+    }
+    return oring;
+}
+
+
+bool calculate_function(vector<bool> values, string s, map<char, int>indx)
 {
-    bool res = 0;
+    bool res;
 
     vector<string> terms;
 
-    if (checkPOS(s)) { //ab+bc
+    if (checkPOS(s)) { //PoS
+        terms = separator_POS(s);
+        res = 1;
+        for (int i = 0; i < terms.size(); i++)
+            res = (res && calculate_expression_POS(values, terms[i], indx));
+        return res;
 
     }
     else { //SoP
+
         terms = separator_SOP(s);
+        res = 0;
         for (int i = 0; i < terms.size(); i++) {
             res = (res || calculate_expression_SOP(values, terms[i], indx));
         }
         return res;
-
     }
 
 
@@ -248,11 +286,11 @@ void truth_table_generator(string s) {
         for (int j = 0; j < values.size(); j++) {
             cout << values[j] << " | ";
         }
-        cout << calculate_function_SOP(values, s, indx) << endl;
+        cout << calculate_function(values, s, indx) << endl;
 
 
         //##### Selecting minterms and maxterms ######
-        if (calculate_function_SOP(values, s, indx))
+        if (calculate_function(values, s, indx))
             minterms[i] = values;
         else
             maxterms[i] = values;
@@ -320,7 +358,7 @@ void truth_table_generator(string s) {
 
 
 
-int countOnes(string binaryLiteral) //first step of the implicaton table: to see how many 1's are in each literal 
+int countOnes(const string& binaryLiteral) //first step of the implicaton table: to see how many 1's are in each literal 
 {
     int counter = 0;
     for (char c : binaryLiteral)
@@ -332,38 +370,10 @@ int countOnes(string binaryLiteral) //first step of the implicaton table: to see
     }
 }
 
-int max(int a, int b)
+int findGroup(string s)//second step is to group the literals with the name number of 1's 
 {
-    if (a>b)
-    return a;
-    else
-    return b;
+    return 0;
 }
-vector<vector<string>>find_groups(map<int,string>bin_dec)
-{
-   
-    int size=0;
-    map<int, std::string>::iterator it;
-    //to define the size of vector<vector>
-    for(it=bin_dec.begin();it!=bin_dec.end();it++)
-    {
-        int num=countOnes(it->second);
-         size=max(size,num);
-        
-        
-    }
-     vector<vector<string>>v(size+1);
-    
-    for(it=bin_dec.begin();it!=bin_dec.end();it++)
-    {
-        int decimal=it->first;
-        string value=it->second;
-       int num= countOnes(value);
-       v[num].push_back(value);
-    }
-    return v;
-}
-
 
 //third: we need to check for grey code - adjacent literals - start comparing 
 //four: we need to replace the different bits with -
@@ -376,9 +386,8 @@ int main()
     string expression;
     expression = "ac'+ab";
     ////cout << check(expression);
-
-    truth_table_generator(expression);
-
+    string s = "(a+b)(b+c)";
+    truth_table_generator(s);
 
 
     return 0;
