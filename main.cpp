@@ -320,7 +320,7 @@ void truth_table_generator(string s) {
 
 
 
-int countOnes(const string& binaryLiteral) //first step of the implicaton table: to see how many 1's are in each literal 
+int countOnes(string binaryLiteral) //first step of the implicaton table: to see how many 1's are in each literal 
 {
     int counter = 0;
     for (char c : binaryLiteral)
@@ -332,10 +332,38 @@ int countOnes(const string& binaryLiteral) //first step of the implicaton table:
     }
 }
 
-int findGroup(string s)//second step is to group the literals with the name number of 1's 
+int max(int a, int b)
 {
-    return 0;
+    if (a>b)
+    return a;
+    else
+    return b;
 }
+vector<vector<string>>find_groups(map<int,string>bin_dec)
+{
+   
+    int size=0;
+    map<int, std::string>::iterator it;
+    //to define the size of vector<vector>
+    for(it=bin_dec.begin();it!=bin_dec.end();it++)
+    {
+        int num=countOnes(it->second);
+         size=max(size,num);
+        
+        
+    }
+     vector<vector<string>>v(size+1);
+    
+    for(it=bin_dec.begin();it!=bin_dec.end();it++)
+    {
+        int decimal=it->first;
+        string value=it->second;
+       int num= countOnes(value);
+       v[num].push_back(value);
+    }
+    return v;
+}
+
 
 //third: we need to check for grey code - adjacent literals - start comparing 
 //four: we need to replace the different bits with -
