@@ -7,6 +7,16 @@
 
 
 using namespace std;
+class Implicant
+{
+public:
+    vector<int> indicies;
+    string binary;
+    bool combine = false;
+
+   // Implicant(const vector<int>& indices, const string& binary) : indicies(indicies), binary(binary) {}
+
+};
 bool isValid(char c)
 {
     //problem with inverted input
@@ -14,6 +24,7 @@ bool isValid(char c)
         return false;
     return true;
 }
+
 bool checkSOP(string str) {
     // bool plus_sign = false;
     // bool last_plussign=false; //to check if there is pus sign at the end
@@ -356,15 +367,6 @@ void truth_table_generator(string s) {
 
 }
 
-
-
-class Implicant
-{
-public:
-    vector<int> indicies;
-    string binary;
-    bool combine = false;
-};
 int countOnes(string binaryLiteral)
 {
     int counter = 0;
@@ -641,6 +643,64 @@ void print_minterms(vector<int>nano,vector<Implicant>primes)
     
     
 }
+
+string binaryToExpression(string s)
+{
+    string expression = "";
+    for (int i = 0; i < s.size(); i++)
+        if (s[i] != '-')
+        {
+            expression += ('a' + i);
+            if (s[i] == '0')
+                expression += "'";
+        }
+    return expression;
+}
+
+
+
+vector<int> findEssentialPrimeImplicants(vector<Implicant>& amal) {
+    map<int, int> mintermCounts; //map to store the minterm(s) (key) and how many of this minterm we have 
+    vector<int> essentialMintermsAmal; 
+ 
+    for (const Implicant& implicant : amal) //loop through the Amal vector 
+    {
+        for (int index : implicant.indicies) //loop through the vector that has the minterms 
+        {
+            if (mintermCounts.find(index) == mintermCounts.end()) // if a minterm is not in the map, 
+            {
+                mintermCounts[index] = 1; //it is initialized with a count of 1, meaning it's unique.
+            }
+            else 
+            {
+                mintermCounts[index]++;//if it's already in the map, its count is incremented
+            }
+        }
+    }
+
+    //printing 
+    for (const Implicant& implicant : amal) //loop through PI amal
+    {
+        bool isEssential = false;
+
+        for (int index : implicant.indicies) //loop through the minterms again
+        {
+            if (mintermCounts[index] == 1) //if they have a count = 1 then they are covered only once 
+            {
+                isEssential = true; //flag is set to true, meaning this minterm exists only once
+                essentialMintermsAmal.push_back(index);
+                //break;
+            }
+        }
+        if (isEssential) //and this minterm goes here and is printed 
+        {
+            //cout << "Essential Prime Implicant as binary: " << implicant.binary << endl; //doctor msh 3ayezha 
+            cout << "Essential Prime Implicant as expression: " << binaryToExpression(implicant.binary) << endl;
+        }
+    }
+    return essentialMintermsAmal; //returns vector<int> that has the minterms covered by essential PIs 
+}
+
 int main()
 {
     string expression;
@@ -682,6 +742,25 @@ int main()
     cout<<"--------------"<<endl;
     vector<int>v={48,49,52,53,56,57,60,61};
     print_minterms(v,primeImplicants);
+
+    //testing nano's function
+    // vector<Implicant> implicants;
+    // implicants.push_back({ {1, 2}, "110", false });
+    // implicants.push_back({ {4, 5}, "101", false });
+    // implicants.push_back({ {1, 4}, "100", false });
+    // implicants.push_back({ {2, 5}, "010", false });
+    // implicants.push_back({ {3}, "001", false });
+    // implicants.push_back({ {6,5,1}, "111", false });
+
+
+    // vector<int> essentialMinterms = findEssentialPrimeImplicants(implicants);
+
+    // //findEssentialPrimeImplicants(implicants);
+    // /*cout << "Essential Prime Implicants' Minterms:" << endl;
+    // for (int minterm : essentialMinterms) {
+    //     cout << minterm << " ";
+    // }*/
+    // cout << endl;
 
     return 0;
 }
