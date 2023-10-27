@@ -753,7 +753,7 @@ int main()
     // implicants.push_back({ {6,5,1}, "111", false });
 
 
-    // vector<int> essentialMinterms = findEssentialPrimeImplicants(implicants);
+    vector<int> essentialMinterms = findEssentialPrimeImplicants(primeImplicants);
 
     // //findEssentialPrimeImplicants(implicants);
     // /*cout << "Essential Prime Implicants' Minterms:" << endl;
