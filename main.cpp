@@ -358,27 +358,250 @@ void truth_table_generator(string s) {
 
 
 
-int countOnes(const string& binaryLiteral) //first step of the implicaton table: to see how many 1's are in each literal 
+class Implicant
+{
+public:
+    vector<int> indicies;
+    string binary;
+    bool combine = false;
+};
+int countOnes(string binaryLiteral)
 {
     int counter = 0;
     for (char c : binaryLiteral)
     {
-        if (c == 1)
+        if (c == '1')
             counter++;
-
-        return counter;
     }
+    return counter;
 }
-
-int findGroup(string s)//second step is to group the literals with the name number of 1's 
+string replace_diff(const string &literal1, const string &literal2)
 {
-    return 0;
+    string new_num = "";
+    for (int i = 0; i < literal1.size(); i++)
+    {
+        if (literal1[i] != literal2[i])
+            new_num += '-';
+        else
+            new_num += literal1[i];
+    }
+    return new_num;
+}
+bool logic_diff(const string &a, const string &b)
+{
+    int count = 0;
+    for (int i = 0; i < a.size(); i++)
+    {
+        if (a[i] != b[i])
+        {
+            count++;
+            if (count > 1)
+            {
+                return false; // If more than one differing bit, return false
+            }
+        }
+    }
+    return (count == 1);
 }
 
-//third: we need to check for grey code - adjacent literals - start comparing 
-//four: we need to replace the different bits with -
-//five: if they are equal, ignore
-//six: see if which PI's we did not use and print them 
+string bool_string(vector<bool> v)
+{
+    string result;
+    for (int i = 0; i < v.size(); i++)
+    {
+        bool value = v[i];
+        result.push_back(value ? '1' : '0');
+    }
+    return result;
+}
+
+vector<Implicant> settingToclass(map<int, vector<bool> > minterms)
+{
+    map<int, vector<bool> >::const_iterator it;
+    Implicant m1;
+    vector<Implicant> imp;
+
+    for (it = minterms.begin(); it != minterms.end(); ++it)
+    {
+        Implicant m1;
+        m1.indicies.push_back(it->first);
+        m1.binary = bool_string(it->second);
+        imp.push_back(m1);
+    }
+
+    return imp;
+}
+vector<vector<Implicant> > find_groups(vector<Implicant> Tawfik)
+{
+
+    vector<vector<Implicant> > v;
+
+    for (const auto &it : Tawfik)
+    {
+        int num = countOnes(it.binary);
+        if (num >= v.size())
+        {
+            v.resize(num + 1);
+        }
+
+        v[num].push_back(it);
+    }
+    return v;
+}
+vector<Implicant> handling(string str1, string str2, string new_binary, vector<Implicant> v1)
+{
+    bool found1 = false, found2 = false;
+    vector<int> merged_vector;
+    int pos1 = -1, pos2 = -1;
+    bool exists = false;//to handle duplicates
+
+    for (const auto &i : v1)
+    {
+        if (i.binary == new_binary)
+        {
+            exists = true;//if i find duplicates i mark their combine as true
+        }
+    }
+
+    for (int i = 0; i < v1.size(); i++)
+    {
+        if (!found1 && v1[i].binary == str1)
+        {
+            pos1 = i;
+            merged_vector.insert(merged_vector.end(), v1[i].indicies.begin(), v1[i].indicies.end());
+            found1 = true;
+        }
+        if (!found2 && v1[i].binary == str2)
+        {
+            pos2 = i;
+            merged_vector.insert(merged_vector.end(), v1[i].indicies.begin(), v1[i].indicies.end());
+            found2 = true;
+        }
+    }
+
+    if (found1 && found2)
+    {
+        v1[pos1].combine = true;
+        v1[pos2].combine = true;
+        //i check if they are not duplicates add their stuff
+        if(!exists){
+            Implicant x;
+            x.binary = new_binary;
+            x.indicies = merged_vector;
+            x.combine = false;
+            v1.push_back(x);
+            
+        }
+    }
+   
+
+    return v1;
+}
+
+vector<Implicant> prime_Impicants(vector<Implicant> Tawfik)
+{
+
+    vector<Implicant> extract_primes;
+    size_t previousSize = 0;
+    int count = 1;
+    while (Tawfik.size() > 0)
+    {
+        vector<vector<Implicant> > res = find_groups(Tawfik);
+
+        for (size_t i = 0; i < res.size() - 1; i++)
+        {
+            vector<Implicant> &row1 = res[i];
+            vector<Implicant> &row2 = res[i + 1];
+            for (size_t j = 0; j < row1.size(); j++)
+            {
+                for (size_t k = 0; k < row2.size(); k++)
+                {
+                    if (logic_diff(row1[j].binary, row2[k].binary))
+                    {
+                        string new_binary = replace_diff(row1[j].binary, row2[k].binary);
+                        Tawfik = handling(row1[j].binary, row2[k].binary, new_binary, Tawfik);
+                       
+                    }
+                }
+            }
+        }
+
+//        for (const auto &imp : Tawfik)
+//        {
+//            cout << "{ ";
+//            for (const auto &index : imp.indicies)
+//            {
+//                cout << index << " ";
+//            }
+//            cout << "} /" << imp.binary << "/ " << imp.combine << endl;
+//        }
+//        cout << "----------------" << endl;
+        //to delete already merged binaries
+        for (int i = 0; i < Tawfik.size();)
+        {
+            if (Tawfik[i].combine == true)
+            {
+                Tawfik.erase(Tawfik.begin() + i);
+            }
+            else
+            {
+                i++;
+            }
+        }
+
+
+
+        // to extract prime implicants
+            for (const auto &imp : Tawfik)
+            {
+                if (!imp.combine && imp.indicies.size() == count)
+                {
+                    extract_primes.push_back(imp);
+                }
+            }
+            
+            //to delete prime_Impicants from Tawfik
+        for (int i = 0; i < Tawfik.size();)
+        {
+            if (Tawfik[i].indicies.size() == count)
+            {
+                Tawfik.erase(Tawfik.begin() + i);
+            }
+            else
+            {
+                i++;
+            }
+        }
+
+        count *=2;
+    }
+
+  
+    return extract_primes;
+}
+
+vector<bool> dec_bin(int num, int num_of_bits)
+{
+    vector<bool> binary_values;
+    int temp = 0;
+    int i = 0;
+    while (num > 0)
+    {
+
+        // storing remainder in binary array
+        binary_values.push_back(num % 2);
+        num = num / 2;
+        i++;
+    }
+    while (i < num_of_bits)
+    { // continuer the remaining places with zeros
+        binary_values.push_back(0);
+        i++;
+    }
+    // Inveting the order of the array so that it match the order of the literals.
+    reverse(binary_values.begin(), binary_values.end());
+    return binary_values;
+}
 
 
 int main()
@@ -388,6 +611,36 @@ int main()
     ////cout << check(expression);
     string s = "(a+b)(b+c)";
     truth_table_generator(s);
+    map<int, vector<bool> > minterms;
+       
+       minterms[10]=dec_bin(10,6);
+       minterms[18] = dec_bin(18,6);
+       minterms[26] = dec_bin(26,6);
+       minterms[40]=dec_bin(40,6);
+       minterms[41]=dec_bin(41,6);
+       minterms[42]=dec_bin(42,6);
+       minterms[48]=dec_bin(48,6);
+       minterms[49]=dec_bin(49,6);
+       minterms[50]=dec_bin(50,6);
+       minterms[52]=dec_bin(52,6);
+       minterms[53]=dec_bin(53,6);
+       minterms[56]=dec_bin(56,6);
+       minterms[57]=dec_bin(57,6);
+       minterms[60]=dec_bin(60,6);
+       minterms[61]=dec_bin(61,6);
+
+       vector<Implicant> Tawfik = settingToclass(minterms);
+       vector<Implicant> primeImplicants = prime_Impicants(Tawfik);
+
+       for (const auto &implicant : primeImplicants)
+       {
+           cout << "Implicant: " << implicant.binary << " Indices: ";
+           for (int index : implicant.indicies)
+           {
+               cout << index << " ";
+           }
+           cout << "\n";
+       }
 
 
     return 0;
