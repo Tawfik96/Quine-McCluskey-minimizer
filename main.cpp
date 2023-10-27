@@ -38,8 +38,8 @@ bool checkSOP(string str) {
 
     // return plus_sign && !last_plussign;
 
-        //nours updated code (try it out ya gama3a garabo el cases kolaha) 
-    bool plus_sign = false; // to check if theres a + 
+        //nours updated code (try it out ya gama3a garabo el cases kolaha)
+    bool plus_sign = false; // to check if theres a +
     bool last_char_was_plus = false; // to check we have no two consecutive '+'
     bool last_char_was_complement = false; // Ensures no two consecutive inversions
 
@@ -50,10 +50,10 @@ bool checkSOP(string str) {
         if (c == '+')
         {
             if (i == 0 || i == str.length() - 1 || last_char_was_plus) //if we are at the beginning or end and we have a +
-                return false; // its invalid 
+                return false; // its invalid
 
-            plus_sign = true; //after checking we dont have + at the beginning or end we change this variable to true 
-            last_char_was_plus = true; //and this variable 
+            plus_sign = true; //after checking we dont have + at the beginning or end we change this variable to true
+            last_char_was_plus = true; //and this variable
             last_char_was_complement = false; // reset after encountering '+'
         }
         else if (c == '\'') //if we have the inversion '
@@ -135,7 +135,7 @@ vector<bool> dec_to_bin(int num, int num_of_bits) {
     int i = 0;
     while (num > 0) {
 
-        // storing remainder in binary array 
+        // storing remainder in binary array
         binary_values.push_back(num % 2);
         num = num / 2;
         i++;
@@ -526,65 +526,66 @@ vector<Implicant> prime_Impicants(vector<Implicant> Tawfik)
             }
         }
 
-//        for (const auto &imp : Tawfik)
-//        {
-//            cout << "{ ";
-//            for (const auto &index : imp.indicies)
-//            {
-//                cout << index << " ";
-//            }
-//            cout << "} /" << imp.binary << "/ " << imp.combine << endl;
-//        }
-//        cout << "----------------" << endl;
+        // for (const auto &imp : Tawfik)
+        // {
+        //     cout << "{ ";
+        //     for (const auto &index : imp.indicies)
+        //     {
+        //         cout << index << " ";
+        //     }
+        //     cout << "} /" << imp.binary << "/ " << imp.combine << endl;
+        // }
+        // cout << "----------------" << endl;
         //to delete already merged binaries
-//        for (int i = 0; i < Tawfik.size();)
-//        {
-//            if (Tawfik[i].combine == true)
-//            {
-//                Tawfik.erase(Tawfik.begin() + i);
-//            }
-//            else
-//            {
-//                i++;
-//            }
-//        }
-        //lw 7asel error men hena check
-               Tawfik.erase(
-           std::remove_if(Tawfik.begin(), Tawfik.end(), [](const Implicant& imp) {
-               return imp.combine; // removes all elements with combine == true
-           }),
-           Tawfik.end()
-       );
+        // for (int i = 0; i < Tawfik.size();)
+        // {
+        //     if (Tawfik[i].combine == true)
+        //     {
+        //         Tawfik.erase(Tawfik.begin() + i);
+        //     }
+        //     else
+        //     {
+        //         i++;
+        //     }
+        // }
+        //lw 7asel error men hena
+        Tawfik.erase(
+    std::remove_if(Tawfik.begin(), Tawfik.end(), [](const Implicant& imp) {
+        return imp.combine; // removes all elements with combine == true
+    }),
+    Tawfik.end()
+);
+
 
 
         // to extract prime implicants
-//            for (const auto &imp : Tawfik)
-//            {
-//                if (!imp.combine && imp.indicies.size() == count)
-//                {
-//                    extract_primes.push_back(imp);
-//                }
-//            }
-//
-//            //to delete prime_Impicants from Tawfik
-//        for (int i = 0; i < Tawfik.size();)
-//        {
-//            if (Tawfik[i].indicies.size() == count)
-//            {
-//                Tawfik.erase(Tawfik.begin() + i);
-//            }
-//            else
-//            {
-//                i++;
-//            }
-//        }
+            for (const auto &imp : Tawfik)
+            {
+                if (!imp.combine && imp.indicies.size() == count)
+                {
+                    extract_primes.push_back(imp);
+                }
+            }
+            
+            //to delete prime_Impicants from Tawfik
+        // for (int i = 0; i < Tawfik.size();)
+        // {
+        //     if (Tawfik[i].indicies.size() == count)
+        //     {
+        //         Tawfik.erase(Tawfik.begin() + i);
+        //     }
+        //     else
+        //     {
+        //         i++;
+        //     }
+        // }
         //lw 7asel error men hena
         Tawfik.erase(
-           std::remove_if(Tawfik.begin(), Tawfik.end(), [count](const Implicant& imp) {
-               return imp.indicies.size() == count;
-           }),
-           Tawfik.end()
-       );
+    std::remove_if(Tawfik.begin(), Tawfik.end(), [count](const Implicant& imp) {
+        return imp.indicies.size() == count;
+    }),
+    Tawfik.end()
+);
 
         count *=2;
     }
@@ -615,7 +616,6 @@ vector<bool> dec_bin(int num, int num_of_bits)
     reverse(binary_values.begin(), binary_values.end());
     return binary_values;
 }
-
 void print_minterms(vector<int>nano,vector<Implicant>primes)
 {
     vector<int>p;
@@ -649,38 +649,39 @@ int main()
     string s = "(a+b)(b+c)";
     truth_table_generator(s);
     map<int, vector<bool> > minterms;
-       
-       minterms[10]=dec_bin(10,6);
-       minterms[18] = dec_bin(18,6);
-       minterms[26] = dec_bin(26,6);
-       minterms[40]=dec_bin(40,6);
-       minterms[41]=dec_bin(41,6);
-       minterms[42]=dec_bin(42,6);
-       minterms[48]=dec_bin(48,6);
-       minterms[49]=dec_bin(49,6);
-       minterms[50]=dec_bin(50,6);
-       minterms[52]=dec_bin(52,6);
-       minterms[53]=dec_bin(53,6);
-       minterms[56]=dec_bin(56,6);
-       minterms[57]=dec_bin(57,6);
-       minterms[60]=dec_bin(60,6);
-       minterms[61]=dec_bin(61,6);
+    
+    minterms[10]=dec_bin(10,6);
+    minterms[18] = dec_bin(18,6);
+    minterms[26] = dec_bin(26,6);
+    minterms[40]=dec_bin(40,6);
+    minterms[41]=dec_bin(41,6);
+    minterms[42]=dec_bin(42,6);
+    minterms[48]=dec_bin(48,6);
+    minterms[49]=dec_bin(49,6);
+    minterms[50]=dec_bin(50,6);
+    minterms[52]=dec_bin(52,6);
+    minterms[53]=dec_bin(53,6);
+    minterms[56]=dec_bin(56,6);
+    minterms[57]=dec_bin(57,6);
+    minterms[60]=dec_bin(60,6);
+    minterms[61]=dec_bin(61,6);
 
-       vector<Implicant> Tawfik = settingToclass(minterms);
-       vector<Implicant> primeImplicants = prime_Impicants(Tawfik);
+    vector<Implicant> Tawfik = settingToclass(minterms);
+    vector<Implicant> primeImplicants = prime_Impicants(Tawfik);
 
-       for (const auto &implicant : primeImplicants)
-       {
-           cout << "Implicant: " << implicant.binary << " Indices: ";
-           for (int index : implicant.indicies)
-           {
-               cout << index << " ";
-           }
-           cout << "\n";
-       }
+    for (const auto &implicant : primeImplicants)
+    {
+        cout << "Implicant: " << implicant.binary << " Indices: ";
+        for (int index : implicant.indicies)
+        {
+            cout << index << " ";
+        }
+        cout << "\n";
+    }
+    
     cout<<"--------------"<<endl;
-        vector<int>v={48,49,52,53,56,57,60,61};
-        print_minterms(v,primeImplicants);
+    vector<int>v={48,49,52,53,56,57,60,61};
+    print_minterms(v,primeImplicants);
 
     return 0;
 }
