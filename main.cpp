@@ -537,41 +537,54 @@ vector<Implicant> prime_Impicants(vector<Implicant> Tawfik)
 //        }
 //        cout << "----------------" << endl;
         //to delete already merged binaries
-        for (int i = 0; i < Tawfik.size();)
-        {
-            if (Tawfik[i].combine == true)
-            {
-                Tawfik.erase(Tawfik.begin() + i);
-            }
-            else
-            {
-                i++;
-            }
-        }
-
+//        for (int i = 0; i < Tawfik.size();)
+//        {
+//            if (Tawfik[i].combine == true)
+//            {
+//                Tawfik.erase(Tawfik.begin() + i);
+//            }
+//            else
+//            {
+//                i++;
+//            }
+//        }
+        //lw 7asel error men hena check
+               Tawfik.erase(
+           std::remove_if(Tawfik.begin(), Tawfik.end(), [](const Implicant& imp) {
+               return imp.combine; // removes all elements with combine == true
+           }),
+           Tawfik.end()
+       );
 
 
         // to extract prime implicants
-            for (const auto &imp : Tawfik)
-            {
-                if (!imp.combine && imp.indicies.size() == count)
-                {
-                    extract_primes.push_back(imp);
-                }
-            }
-            
-            //to delete prime_Impicants from Tawfik
-        for (int i = 0; i < Tawfik.size();)
-        {
-            if (Tawfik[i].indicies.size() == count)
-            {
-                Tawfik.erase(Tawfik.begin() + i);
-            }
-            else
-            {
-                i++;
-            }
-        }
+//            for (const auto &imp : Tawfik)
+//            {
+//                if (!imp.combine && imp.indicies.size() == count)
+//                {
+//                    extract_primes.push_back(imp);
+//                }
+//            }
+//
+//            //to delete prime_Impicants from Tawfik
+//        for (int i = 0; i < Tawfik.size();)
+//        {
+//            if (Tawfik[i].indicies.size() == count)
+//            {
+//                Tawfik.erase(Tawfik.begin() + i);
+//            }
+//            else
+//            {
+//                i++;
+//            }
+//        }
+        //lw 7asel error men hena
+        Tawfik.erase(
+           std::remove_if(Tawfik.begin(), Tawfik.end(), [count](const Implicant& imp) {
+               return imp.indicies.size() == count;
+           }),
+           Tawfik.end()
+       );
 
         count *=2;
     }
@@ -603,7 +616,31 @@ vector<bool> dec_bin(int num, int num_of_bits)
     return binary_values;
 }
 
-
+void print_minterms(vector<int>nano,vector<Implicant>primes)
+{
+    vector<int>p;
+    vector<int>print;
+    
+    for(const auto &it:primes)
+    {
+        for (const auto &index : it.indicies)
+        {
+            p.push_back(index);
+        }
+    }
+    for (const auto &item : p) {
+        if (std::find(nano.begin(), nano.end(), item) == nano.end()) {
+           print.push_back(item);
+        }
+    }
+       std::sort(print.begin(), print.end());
+       print.erase(std::unique(print.begin(), print.end()), print.end());
+     for(int i=0;i<print.size();i++)
+     cout<<print[i]<<" ";
+     cout<<endl;
+    
+    
+}
 int main()
 {
     string expression;
@@ -641,7 +678,9 @@ int main()
            }
            cout << "\n";
        }
-
+    cout<<"--------------"<<endl;
+        vector<int>v={48,49,52,53,56,57,60,61};
+        print_minterms(v,primeImplicants);
 
     return 0;
 }
