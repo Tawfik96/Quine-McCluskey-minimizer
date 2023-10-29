@@ -394,7 +394,7 @@ vector<Implicant> truth_table_generator(string s) {
     cout << can_POS << endl;
 
     return settingToclass(minterms);
-
+  
 }
 
 int countOnes(string binaryLiteral)
@@ -757,10 +757,10 @@ void Kmaps_print(string str, vector<int>minterms)
     cout << "\nPrinting The K-MAP:" << endl;
 
     vector<string>s = { "00","01","11","10" };
-
+    
 
     for (int i = 0; i < row; i++) {
-
+        
         for (int j = 0; j < col; j++) {
             cout << setw(2) << kmap[i][j] << " ";
         }
@@ -804,9 +804,9 @@ int main()
     expression = "ab+cd'";
 
     vector<Implicant> Tawfik = truth_table_generator(expression);
-    vector<int>minterms = get_minterms(Tawfik);
+    vector<int>minterms=get_minterms(Tawfik);
 
-
+   
     vector<Implicant> primeImplicants = prime_Impicants(Tawfik);
 
 
@@ -820,7 +820,7 @@ int main()
 
     Kmaps_print(expression, essentialMinterms);
 
-
+    
 
 
     return 0;
