@@ -4,7 +4,7 @@
 #include<cmath>
 #include<algorithm>
 #include <vector>
-
+#include<iomanip>
 
 using namespace std;
 class Implicant
@@ -14,7 +14,7 @@ public:
     string binary;
     bool combine = false;
 
-   // Implicant(const vector<int>& indices, const string& binary) : indicies(indicies), binary(binary) {}
+    // Implicant(const vector<int>& indices, const string& binary) : indicies(indicies), binary(binary) {}
 
 };
 bool isValid(char c)
@@ -272,7 +272,36 @@ vector<char> NumberOfLiterals(string str) {
     return literals;
 }
 
-void truth_table_generator(string s) {
+
+string bool_string(vector<bool> v)
+{
+    string result;
+    for (int i = 0; i < v.size(); i++)
+    {
+        bool value = v[i];
+        result.push_back(value ? '1' : '0');
+    }
+    return result;
+}
+
+vector<Implicant> settingToclass(map<int, vector<bool> > minterms)
+{
+    map<int, vector<bool> >::const_iterator it;
+    Implicant m1;
+    vector<Implicant> imp;
+
+    for (it = minterms.begin(); it != minterms.end(); ++it)
+    {
+        Implicant m1;
+        m1.indicies.push_back(it->first);
+        m1.binary = bool_string(it->second);
+        imp.push_back(m1);
+    }
+
+    return imp;
+}
+
+vector<Implicant> truth_table_generator(string s) {
 
     map<char, int>indx;
     map<int, vector<bool>>minterms;
@@ -362,8 +391,9 @@ void truth_table_generator(string s) {
         can_POS.pop_back();
         can_POS += ')';
     }
-
     cout << can_POS << endl;
+
+    return settingToclass(minterms);
 
 }
 
@@ -377,7 +407,7 @@ int countOnes(string binaryLiteral)
     }
     return counter;
 }
-string replace_diff(const string &literal1, const string &literal2)
+string replace_diff(const string& literal1, const string& literal2)
 {
     string new_num = "";
     for (int i = 0; i < literal1.size(); i++)
@@ -389,7 +419,7 @@ string replace_diff(const string &literal1, const string &literal2)
     }
     return new_num;
 }
-bool logic_diff(const string &a, const string &b)
+bool logic_diff(const string& a, const string& b)
 {
     int count = 0;
     for (int i = 0; i < a.size(); i++)
@@ -406,39 +436,12 @@ bool logic_diff(const string &a, const string &b)
     return (count == 1);
 }
 
-string bool_string(vector<bool> v)
-{
-    string result;
-    for (int i = 0; i < v.size(); i++)
-    {
-        bool value = v[i];
-        result.push_back(value ? '1' : '0');
-    }
-    return result;
-}
-
-vector<Implicant> settingToclass(map<int, vector<bool> > minterms)
-{
-    map<int, vector<bool> >::const_iterator it;
-    Implicant m1;
-    vector<Implicant> imp;
-
-    for (it = minterms.begin(); it != minterms.end(); ++it)
-    {
-        Implicant m1;
-        m1.indicies.push_back(it->first);
-        m1.binary = bool_string(it->second);
-        imp.push_back(m1);
-    }
-
-    return imp;
-}
 vector<vector<Implicant> > find_groups(vector<Implicant> Tawfik)
 {
 
     vector<vector<Implicant> > v;
 
-    for (const auto &it : Tawfik)
+    for (const auto& it : Tawfik)
     {
         int num = countOnes(it.binary);
         if (num >= v.size())
@@ -457,7 +460,7 @@ vector<Implicant> handling(string str1, string str2, string new_binary, vector<I
     int pos1 = -1, pos2 = -1;
     bool exists = false;//to handle duplicates
 
-    for (const auto &i : v1)
+    for (const auto& i : v1)
     {
         if (i.binary == new_binary)
         {
@@ -486,16 +489,16 @@ vector<Implicant> handling(string str1, string str2, string new_binary, vector<I
         v1[pos1].combine = true;
         v1[pos2].combine = true;
         //i check if they are not duplicates add their stuff
-        if(!exists){
+        if (!exists) {
             Implicant x;
             x.binary = new_binary;
             x.indicies = merged_vector;
             x.combine = false;
             v1.push_back(x);
-            
+
         }
     }
-   
+
 
     return v1;
 }
@@ -512,8 +515,8 @@ vector<Implicant> prime_Impicants(vector<Implicant> Tawfik)
 
         for (size_t i = 0; i < res.size() - 1; i++)
         {
-            vector<Implicant> &row1 = res[i];
-            vector<Implicant> &row2 = res[i + 1];
+            vector<Implicant>& row1 = res[i];
+            vector<Implicant>& row2 = res[i + 1];
             for (size_t j = 0; j < row1.size(); j++)
             {
                 for (size_t k = 0; k < row2.size(); k++)
@@ -522,7 +525,7 @@ vector<Implicant> prime_Impicants(vector<Implicant> Tawfik)
                     {
                         string new_binary = replace_diff(row1[j].binary, row2[k].binary);
                         Tawfik = handling(row1[j].binary, row2[k].binary, new_binary, Tawfik);
-                       
+
                     }
                 }
             }
@@ -552,47 +555,47 @@ vector<Implicant> prime_Impicants(vector<Implicant> Tawfik)
         // }
         //lw 7asel error men hena
         Tawfik.erase(
-    std::remove_if(Tawfik.begin(), Tawfik.end(), [](const Implicant& imp) {
-        return imp.combine; // removes all elements with combine == true
-    }),
-    Tawfik.end()
-);
+            std::remove_if(Tawfik.begin(), Tawfik.end(), [](const Implicant& imp) {
+                return imp.combine; // removes all elements with combine == true
+                }),
+            Tawfik.end()
+                    );
 
 
 
         // to extract prime implicants
-            for (const auto &imp : Tawfik)
+        for (const auto& imp : Tawfik)
+        {
+            if (!imp.combine && imp.indicies.size() == count)
             {
-                if (!imp.combine && imp.indicies.size() == count)
-                {
-                    extract_primes.push_back(imp);
-                }
+                extract_primes.push_back(imp);
             }
-            
-            //to delete prime_Impicants from Tawfik
-        // for (int i = 0; i < Tawfik.size();)
-        // {
-        //     if (Tawfik[i].indicies.size() == count)
-        //     {
-        //         Tawfik.erase(Tawfik.begin() + i);
-        //     }
-        //     else
-        //     {
-        //         i++;
-        //     }
-        // }
-        //lw 7asel error men hena
-        Tawfik.erase(
-    std::remove_if(Tawfik.begin(), Tawfik.end(), [count](const Implicant& imp) {
-        return imp.indicies.size() == count;
-    }),
-    Tawfik.end()
-);
+        }
 
-        count *=2;
+        //to delete prime_Impicants from Tawfik
+    // for (int i = 0; i < Tawfik.size();)
+    // {
+    //     if (Tawfik[i].indicies.size() == count)
+    //     {
+    //         Tawfik.erase(Tawfik.begin() + i);
+    //     }
+    //     else
+    //     {
+    //         i++;
+    //     }
+    // }
+    //lw 7asel error men hena
+        Tawfik.erase(
+            std::remove_if(Tawfik.begin(), Tawfik.end(), [count](const Implicant& imp) {
+                return imp.indicies.size() == count;
+                }),
+            Tawfik.end()
+                    );
+
+        count *= 2;
     }
 
-  
+
     return extract_primes;
 }
 
@@ -618,30 +621,30 @@ vector<bool> dec_bin(int num, int num_of_bits)
     reverse(binary_values.begin(), binary_values.end());
     return binary_values;
 }
-void print_minterms(vector<int>nano,vector<Implicant>primes)
+void print_minterms(vector<int>nano, vector<Implicant>primes)
 {
     vector<int>p;
     vector<int>print;
-    
-    for(const auto &it:primes)
+
+    for (const auto& it : primes)
     {
-        for (const auto &index : it.indicies)
+        for (const auto& index : it.indicies)
         {
             p.push_back(index);
         }
     }
-    for (const auto &item : p) {
+    for (const auto& item : p) {
         if (std::find(nano.begin(), nano.end(), item) == nano.end()) {
-           print.push_back(item);
+            print.push_back(item);
         }
     }
-       std::sort(print.begin(), print.end());
-       print.erase(std::unique(print.begin(), print.end()), print.end());
-     for(int i=0;i<print.size();i++)
-     cout<<print[i]<<" ";
-     cout<<endl;
-    
-    
+    std::sort(print.begin(), print.end());
+    print.erase(std::unique(print.begin(), print.end()), print.end());
+    for (int i = 0; i < print.size(); i++)
+        cout << print[i] << " ";
+    cout << endl;
+
+
 }
 
 string binaryToExpression(string s)
@@ -661,8 +664,8 @@ string binaryToExpression(string s)
 
 vector<int> findEssentialPrimeImplicants(vector<Implicant>& amal) {
     map<int, int> mintermCounts; //map to store the minterm(s) (key) and how many of this minterm we have 
-    vector<int> essentialMintermsAmal; 
- 
+    vector<int> essentialMintermsAmal;
+
     for (const Implicant& implicant : amal) //loop through the Amal vector 
     {
         for (int index : implicant.indicies) //loop through the vector that has the minterms 
@@ -671,7 +674,7 @@ vector<int> findEssentialPrimeImplicants(vector<Implicant>& amal) {
             {
                 mintermCounts[index] = 1; //it is initialized with a count of 1, meaning it's unique.
             }
-            else 
+            else
             {
                 mintermCounts[index]++;//if it's already in the map, its count is incremented
             }
@@ -679,6 +682,8 @@ vector<int> findEssentialPrimeImplicants(vector<Implicant>& amal) {
     }
 
     //printing 
+
+    cout << "\n Printing Essential Prime Implicants:\n";
     for (const Implicant& implicant : amal) //loop through PI amal
     {
         bool isEssential = false;
@@ -695,72 +700,128 @@ vector<int> findEssentialPrimeImplicants(vector<Implicant>& amal) {
         if (isEssential) //and this minterm goes here and is printed 
         {
             //cout << "Essential Prime Implicant as binary: " << implicant.binary << endl; //doctor msh 3ayezha 
-            cout << "Essential Prime Implicant as expression: " << binaryToExpression(implicant.binary) << endl;
+            cout << binaryToExpression(implicant.binary) << endl;
         }
     }
     return essentialMintermsAmal; //returns vector<int> that has the minterms covered by essential PIs 
 }
 
-int main()
+
+// printing Kmaps
+int Number_Literals(string str) {
+    vector<char> literals; // Use char instead of string to store individual characters
+
+    for (char c : str) {
+        if (isValid(c)) {
+            literals.push_back(c);
+        }
+    }
+
+    // Sort and remove duplicates
+    sort(literals.begin(), literals.end());
+    literals.erase(unique(literals.begin(), literals.end()), literals.end());
+
+    int count = literals.size();
+    return count;
+}
+
+void Kmaps_print(string str, vector<int>minterms)
 {
-    string expression;
-    expression = "ac'+ab";
-    ////cout << check(expression);
-    string s = "(a+b)(b+c)";
-    truth_table_generator(s);
-    map<int, vector<bool> > minterms;
-    
-    minterms[10]=dec_bin(10,6);
-    minterms[18] = dec_bin(18,6);
-    minterms[26] = dec_bin(26,6);
-    minterms[40]=dec_bin(40,6);
-    minterms[41]=dec_bin(41,6);
-    minterms[42]=dec_bin(42,6);
-    minterms[48]=dec_bin(48,6);
-    minterms[49]=dec_bin(49,6);
-    minterms[50]=dec_bin(50,6);
-    minterms[52]=dec_bin(52,6);
-    minterms[53]=dec_bin(53,6);
-    minterms[56]=dec_bin(56,6);
-    minterms[57]=dec_bin(57,6);
-    minterms[60]=dec_bin(60,6);
-    minterms[61]=dec_bin(61,6);
-
-    vector<Implicant> Tawfik = settingToclass(minterms);
-    vector<Implicant> primeImplicants = prime_Impicants(Tawfik);
-
-    for (const auto &implicant : primeImplicants)
+    //determine the size of the Kmap
+    int numOfvariable = Number_Literals(str);
+    int row = -1, col = -1;
+    if (numOfvariable == 2)
     {
-        cout << "Implicant: " << implicant.binary << " Indices: ";
+        row = 2;
+        col = 2;
+    }
+    else if (numOfvariable == 3)
+    {
+        row = 2;
+        col = 4;
+    }
+    else
+    {
+        row = 4;
+        col = 4;
+    }
+    int kmap[4][4] = { 0 };//intialize all the kmap with 0
+    //this will make it 0,1,3,2, so on.
+    int gray_code[4] = { 0,1,3,2 };
+    for (int m : minterms)
+    {
+        int k = gray_code[m / col];//to determine row_postion, is the max number of col in the kmap
+        int j = gray_code[m % col];//to determine col_postion
+        kmap[k][j] = 1;//assign 1 to minterm in the kmap
+    }
+    cout << "\nPrinting The K-MAP:" << endl;
+
+    vector<string>s = { "00","01","11","10" };
+
+
+    for (int i = 0; i < row; i++) {
+
+        for (int j = 0; j < col; j++) {
+            cout << setw(2) << kmap[i][j] << " ";
+        }
+        cout << endl;
+    }
+
+}
+vector<int> get_minterms(vector<Implicant>v)
+{
+    vector<int>x;
+
+    for (const auto& implicant : v)
+    {
+        for (int index : implicant.indicies)
+        {
+
+            x.push_back(index);
+        }
+
+    }
+    return x;
+}
+void print_primeImplicants(vector<Implicant>v)
+{
+    for (const auto& implicant : v)
+    {
+        cout << "Implicant: " << implicant.binary << " Indicies: ";
         for (int index : implicant.indicies)
         {
             cout << index << " ";
+
         }
         cout << "\n";
     }
-    
-    cout<<"--------------"<<endl;
-    vector<int>v={48,49,52,53,56,57,60,61};
-    print_minterms(v,primeImplicants);
+}
 
-    //testing nano's function
-    // vector<Implicant> implicants;
-    // implicants.push_back({ {1, 2}, "110", false });
-    // implicants.push_back({ {4, 5}, "101", false });
-    // implicants.push_back({ {1, 4}, "100", false });
-    // implicants.push_back({ {2, 5}, "010", false });
-    // implicants.push_back({ {3}, "001", false });
-    // implicants.push_back({ {6,5,1}, "111", false });
+
+int main()
+{
+    string expression;
+    expression = "ab+cd'";
+
+    vector<Implicant> Tawfik = truth_table_generator(expression);
+    vector<int>minterms = get_minterms(Tawfik);
+
+
+    vector<Implicant> primeImplicants = prime_Impicants(Tawfik);
+
+
+
+    cout << endl << endl;
+    cout << "primeImplicants: " << endl;
+    print_primeImplicants(primeImplicants);
 
 
     vector<int> essentialMinterms = findEssentialPrimeImplicants(primeImplicants);
 
-    // //findEssentialPrimeImplicants(implicants);
-    // /*cout << "Essential Prime Implicants' Minterms:" << endl;
-    // for (int minterm : essentialMinterms) {
-    //     cout << minterm << " ";
-    // }*/
-    // cout << endl;
+    Kmaps_print(expression, essentialMinterms);
+
+
+
 
     return 0;
 }
