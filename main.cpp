@@ -701,6 +701,63 @@ vector<int> findEssentialPrimeImplicants(vector<Implicant>& amal) {
     return essentialMintermsAmal; //returns vector<int> that has the minterms covered by essential PIs 
 }
 
+//printing Kmaps
+int Number_Literals(string str) {
+     vector<char> literals; // Use char instead of string to store individual characters
+
+    for (char c : str) {
+        if (isValid(c)) {
+            literals.push_back(c);
+        }
+    }
+
+    // Sort and remove duplicates
+    sort(literals.begin(), literals.end());
+    literals.erase(unique(literals.begin(), literals.end()), literals.end());
+
+    int count = literals.size();
+    return count;
+}
+void Kmaps_print(string str, vector<int>minterms)
+{
+    //determine the size of the Kmap
+    int numOfvariable=Number_Literals(str);
+    int row=-1,col=-1;
+    if(numOfvariable==2)
+    {
+        row=2;
+        col=2;
+    }
+    else if(numOfvariable==3)
+    {
+        row=2;
+        col=4;
+    }
+    else
+    {
+        row=4;
+        col=4;
+    }
+    int kmap[4][4] = {0};//intialize all the kmap with 0
+    //this will make it 0,1,3,2, so on.
+    int gray_code[4]={0,1,3,2};
+     for(int m:minterms)
+     {
+         int k=gray_code[m/col];//to determine row_postion, is the max number of col in the kmap
+         int j=gray_code[m%col];//to determine col_postion
+         kmap[k][j]=1;//assign 1 to minterm in the kmap
+     }
+     cout<<"printing the kmap:"<<endl;
+     
+     for (int i = 0; i < row; i++) {
+        for (int j = 0; j < col; j++) {
+            cout << setw(2) << kmap[i][j] << " ";
+        }
+       cout << endl;
+    }
+    
+}
+
 int main()
 {
     string expression;
@@ -728,13 +785,14 @@ int main()
 
     vector<Implicant> Tawfik = settingToclass(minterms);
     vector<Implicant> primeImplicants = prime_Impicants(Tawfik);
-
+    vector<int>test_kmap;
     for (const auto &implicant : primeImplicants)
     {
         cout << "Implicant: " << implicant.binary << " Indices: ";
         for (int index : implicant.indicies)
         {
             cout << index << " ";
+            test_kmap.push_back(index);
         }
         cout << "\n";
     }
@@ -760,9 +818,10 @@ int main()
     // for (int minterm : essentialMinterms) {
     //     cout << minterm << " ";
     // }*/
-    // cout << endl;
+     cout << endl;
+
+   Kmaps_print(s, test_kmap);
 
     return 0;
 }
-
 
