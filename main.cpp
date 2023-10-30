@@ -5,6 +5,8 @@
 #include<algorithm>
 #include <vector>
 #include<iomanip>
+#include <fstream>
+#include <cstdlib>
 
 using namespace std;
 class Implicant
@@ -394,7 +396,7 @@ vector<Implicant> truth_table_generator(string s) {
     cout << can_POS << endl;
 
     return settingToclass(minterms);
-  
+
 }
 
 int countOnes(string binaryLiteral)
@@ -734,6 +736,7 @@ void Kmaps_print(string str, vector<int>minterms)
     {
         cout << "invalid input size!" << endl;
               return;
+        return;
     }
     if (numOfvariable == 2)
     {
@@ -762,10 +765,10 @@ void Kmaps_print(string str, vector<int>minterms)
     cout << "\nPrinting The K-MAP:" << endl;
 
     vector<string>s = { "00","01","11","10" };
-    
+
 
     for (int i = 0; i < row; i++) {
-        
+
         for (int j = 0; j < col; j++) {
             cout << setw(2) << kmap[i][j] << " ";
         }
@@ -803,36 +806,147 @@ void print_primeImplicants(vector<Implicant>v)
 }
 
 
+void open_url(string url) {
+
+#ifdef _WIN32
+    // Windows command
+    string command = "start " + url;
+#elif _WIN64
+    string command = "start " + url;
+#elif _APPLE_
+    // macOS command
+    string command = "open " + url;
+#elif _MACH_
+    string command = "open " + url;
+#else
+    // Linux command
+    string command = "xdg-open " + url;
+#endif
+
+    int result = system(command.c_str());
+    if (result != 0) {
+        cerr << "Failed to open browser" << endl;
+    }
+
+}
+void display_circuit(string expression) {
+
+    vector<string>s = separator_SOP(expression);  //separating the expression into individual terms
+    const string url = "C:/Users/ahmed/OneDrive/Desktop/TAWFIK/UNI/fall2023/Digital_Design/Quine-McCluskey-minimizer/circuit.html";
+
+
+    //standard initializtion (same for different expressions in sop)
+    string taw =
+        "<!DOCTYPE html>\n"
+        "<html>\n"
+        "<head>\n"
+        "<title>Displaying Circuit</title>\n"
+        "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/wavedrom/3.1.0/skins/default.js\" type=\"text/javascript\"></script>\n"
+        "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/wavedrom/3.1.0/wavedrom.min.js\" type=\"text/javascript\"></script>\n"
+        "</head>\n"
+        "<body onload=\"WaveDrom.ProcessAll()\">\n"
+        "<script type=\"WaveDrom\">\n"
+        "{ assign:[\n"
+        "  [\"out\",\n"
+        "    [\"|\",\n";
+
+    //plugging in the new expression
+    for (int i = 0; i < s.size(); i++) {
+
+        //if I have one literal in that term
+        if (s[i].size() == 1) {
+            taw.pop_back();
+            taw += " \"";
+            taw += s[i][0];
+            taw += "\",\n";
+        }
+        else if (s[i].size() == 2 && s[i][1] == '\'') {    //if I have one literal in that term but it is iverted
+            taw.pop_back();
+            taw += " [\"~\", \"";
+            taw += s[i][0];
+            taw += "\"],\n";
+        }
+        else {                                  //if I have multiple literals in that term
+            taw += "      [\"&\"";
+            for (int j = 0; j < s[i].size(); j++) {
+                if (j + 1 < s[i].size() && s[i][j + 1] == '\'') {
+                    taw += ", [\"~\", \"";
+                    taw += s[i][j];
+                    taw += "\"]";
+                    j++;
+                }
+                else {
+                    taw += ", \"";
+                    taw += s[i][j];
+                    taw += "\"";
+                }
+            }
+            taw += "],\n";
+        }
+    }
+
+    //adjustments
+    taw.pop_back();
+    taw.pop_back();
+
+    //standard things
+    taw += "\n    ]\n"
+        "  ]\n"
+        "]}\n"
+        "</script>\n"
+        "<h1>Testing Circuit</h1>\n"
+        "</body>\n"
+        "</html>\n";
+
+    // storing the new code into the html file (the same url)
+    ofstream htmlFile(url);
+    if (htmlFile.is_open()) {
+        htmlFile << taw;
+        htmlFile.close();
+    }
+    else
+        cout << "Unable to open the file for writing." << endl;
+
+
+    //opening this html file in the browser
+    open_url(url);
+
+
+}
+
 int main()
 {
     string expression;
-    expression = "1abc+de+b'c'";
-   bool flag= check(expression);
-   
-    if(flag==true){
+    expression = "ab+cd'";
+
+    bool flag = check(expression);
+
+    if (flag == true) {
         vector<Implicant> Tawfik = truth_table_generator(expression);
-        vector<int>minterms=get_minterms(Tawfik);
-        
-        
+        vector<int>minterms = get_minterms(Tawfik);
+
+
         vector<Implicant> primeImplicants = prime_Impicants(Tawfik);
-        
-        
-        
+
+
+
         cout << endl << endl;
         cout << "primeImplicants: " << endl;
         print_primeImplicants(primeImplicants);
-        
-        
+
+
         vector<int> essentialMinterms = findEssentialPrimeImplicants(primeImplicants);
-        
+
         Kmaps_print(expression, essentialMinterms);
     }
     else
     {
-        cout<<"not valid, enter correct input!"<<endl;
+        cout << "not valid, enter correct input!" << endl;
     }
 
-    
+
+    display_circuit("a+b'");            //plug in the expression
+
 
 
     return 0;
