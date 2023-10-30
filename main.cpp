@@ -112,26 +112,22 @@ bool checkPOS(const string& expression)
 
     return true;
 }
-string check(const string& expression)
+bool check(const string& expression)
 {
     if (checkSOP(expression))
-        return "SOP";
+        return true;
     else if (checkPOS(expression))
-        return "POS";
+        return true;
 
     else
-        return "enter valid input";
+        return false; 
 
 
 }
 
 
 
-//void display( vector<bool> k) {
-//    for (int i = 0; i < k.size(); i++) {
-//        cout << k[i] << ",";
-//    }
-//}
+
 
 // Function to count how many literals do we have.
 int count_variables(string s) {
@@ -776,6 +772,7 @@ void Kmaps_print(string str, vector<int>minterms)
     }
 
 }
+// to find minterms not in essential
 vector<int> get_minterms(vector<Implicant>v)
 {
     vector<int>x;
