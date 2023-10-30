@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Displaying Circuit</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/wavedrom/3.1.0/skins/default.js" type="text/javascript"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/wavedrom/3.1.0/wavedrom.min.js" type="text/javascript"></script>
+</head>
+<body onload="WaveDrom.ProcessAll()">
+<script type="WaveDrom">
+{ assign:[
+  ["out",
+    ["|", "a", ["~", "b"]
+    ]
+  ]
+]}
+</script>
+<h1>Testing Circuit</h1>
+</body>
+</html>
