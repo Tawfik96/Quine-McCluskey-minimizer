@@ -730,6 +730,11 @@ void Kmaps_print(string str, vector<int>minterms)
     //determine the size of the Kmap
     int numOfvariable = Number_Literals(str);
     int row = -1, col = -1;
+    if(numOfvariable>4 || numOfvariable<2 )
+    {
+        cout << "invalid input size!" << endl;
+              return;
+    }
     if (numOfvariable == 2)
     {
         row = 2;
@@ -801,24 +806,31 @@ void print_primeImplicants(vector<Implicant>v)
 int main()
 {
     string expression;
-    expression = "ab+cd'";
-
-    vector<Implicant> Tawfik = truth_table_generator(expression);
-    vector<int>minterms=get_minterms(Tawfik);
-
+    expression = "1abc+de+b'c'";
+   bool flag= check(expression);
    
-    vector<Implicant> primeImplicants = prime_Impicants(Tawfik);
-
-
-
-    cout << endl << endl;
-    cout << "primeImplicants: " << endl;
-    print_primeImplicants(primeImplicants);
-
-
-    vector<int> essentialMinterms = findEssentialPrimeImplicants(primeImplicants);
-
-    Kmaps_print(expression, essentialMinterms);
+    if(flag==true){
+        vector<Implicant> Tawfik = truth_table_generator(expression);
+        vector<int>minterms=get_minterms(Tawfik);
+        
+        
+        vector<Implicant> primeImplicants = prime_Impicants(Tawfik);
+        
+        
+        
+        cout << endl << endl;
+        cout << "primeImplicants: " << endl;
+        print_primeImplicants(primeImplicants);
+        
+        
+        vector<int> essentialMinterms = findEssentialPrimeImplicants(primeImplicants);
+        
+        Kmaps_print(expression, essentialMinterms);
+    }
+    else
+    {
+        cout<<"not valid, enter correct input!"<<endl;
+    }
 
     
 
