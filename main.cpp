@@ -611,52 +611,29 @@ vector<Implicant> prime_Impicants(vector<Implicant> Tawfik)
     return extract_primes;
 }
 
-vector<bool> dec_bin(int num, int num_of_bits)
-{
-    vector<bool> binary_values;
-    int temp = 0;
-    int i = 0;
-    while (num > 0)
-    {
 
-        // storing remainder in binary array
-        binary_values.push_back(num % 2);
-        num = num / 2;
-        i++;
-    }
-    while (i < num_of_bits)
-    { // continuer the remaining places with zeros
-        binary_values.push_back(0);
-        i++;
-    }
-    // Inveting the order of the array so that it match the order of the literals.
-    reverse(binary_values.begin(), binary_values.end());
-    return binary_values;
-}
-void print_minterms(vector<int>nano, vector<Implicant>primes)
+vector<int>mintermsnotcoveredbyessential(vector<int>nano,vector<Implicant>primes)
 {
     vector<int>p;
     vector<int>print;
-
-    for (const auto& it : primes)
+    
+    for(const auto &it:primes)
     {
-        for (const auto& index : it.indicies)
+        for (const auto &index : it.indicies)
         {
             p.push_back(index);
         }
     }
-    for (const auto& item : p) {
+    for (const auto &item : p) {
         if (std::find(nano.begin(), nano.end(), item) == nano.end()) {
-            print.push_back(item);
+           print.push_back(item);
         }
     }
-    std::sort(print.begin(), print.end());
-    print.erase(std::unique(print.begin(), print.end()), print.end());
-    for (int i = 0; i < print.size(); i++)
-        cout << print[i] << " ";
-    cout << endl;
+       std::sort(print.begin(), print.end());
+       print.erase(std::unique(print.begin(), print.end()), print.end());
 
-
+    return print;
+    
 }
 
 string binaryToExpression(string s)
@@ -675,47 +652,46 @@ string binaryToExpression(string s)
 
 
 vector<int> findEssentialPrimeImplicants(vector<Implicant>& amal) {
-    map<int, int> mintermCounts; //map to store the minterm(s) (key) and how many of this minterm we have 
+    map<int, int> mintermCounts; // Map to store the minterm(s) (key) and how many of this minterm we have
     vector<int> essentialMintermsAmal;
+    vector<int> test; // This was not used in the function. Do you need it?
 
-    for (const Implicant& implicant : amal) //loop through the Amal vector 
-    {
-        for (int index : implicant.indicies) //loop through the vector that has the minterms 
-        {
-            if (mintermCounts.find(index) == mintermCounts.end()) // if a minterm is not in the map, 
-            {
-                mintermCounts[index] = 1; //it is initialized with a count of 1, meaning it's unique.
-            }
-            else
-            {
-                mintermCounts[index]++;//if it's already in the map, its count is incremented
+    // Count occurrences of each minterm
+    for (const Implicant& implicant : amal) {
+        for (int index : implicant.indicies) {
+            if (mintermCounts.find(index) == mintermCounts.end()) {
+                mintermCounts[index] = 1;
+            } else {
+                mintermCounts[index]++;
             }
         }
     }
 
-    //printing 
-
     cout << "\n Printing Essential Prime Implicants:\n";
-    for (const Implicant& implicant : amal) //loop through PI amal
-    {
+
+    for (const Implicant& implicant : amal) {
         bool isEssential = false;
 
-        for (int index : implicant.indicies) //loop through the minterms again
-        {
-            if (mintermCounts[index] == 1) //if they have a count = 1 then they are covered only once 
-            {
-                isEssential = true; //flag is set to true, meaning this minterm exists only once
-                essentialMintermsAmal.push_back(index);
-                //break;
+        for (int index : implicant.indicies) {
+            if (mintermCounts[index] == 1) {
+                isEssential = true;
+                
+                // Push all the indices from the implicant into essentialMintermsAmal
+                essentialMintermsAmal.insert(essentialMintermsAmal.end(), implicant.indicies.begin(), implicant.indicies.end());
+                
+                // No need to keep checking other indices in the current implicant
+                break;
             }
         }
-        if (isEssential) //and this minterm goes here and is printed 
-        {
-            //cout << "Essential Prime Implicant as binary: " << implicant.binary << endl; //doctor msh 3ayezha 
+
+      
+
+        if (isEssential) {
             cout << binaryToExpression(implicant.binary) << endl;
         }
     }
-    return essentialMintermsAmal; //returns vector<int> that has the minterms covered by essential PIs 
+
+    return essentialMintermsAmal;
 }
 
 
@@ -741,13 +717,14 @@ void Kmaps_print(string str, vector<int>minterms)
 {
     //determine the size of the Kmap
     int numOfvariable = Number_Literals(str);
-    int row = -1, col = -1;
+    string headers2[] = {"0", "1"};
+    string headers4[] = {"00", "01", "11", "10"};
     if(numOfvariable>4 || numOfvariable<2 )
     {
         cout << "invalid input size!" << endl;
               return;
-        return;
     }
+    int row = -1, col = -1;
     if (numOfvariable == 2)
     {
         row = 2;
@@ -772,20 +749,38 @@ void Kmaps_print(string str, vector<int>minterms)
         int j = gray_code[m % col];//to determine col_postion
         kmap[k][j] = 1;//assign 1 to minterm in the kmap
     }
+
     cout << "\nPrinting The K-MAP:" << endl;
 
-    vector<string>s = { "00","01","11","10" };
-
-
-    for (int i = 0; i < row; i++) {
-
-        for (int j = 0; j < col; j++) {
-            cout << setw(2) << kmap[i][j] << " ";
+        // Print top header
+        cout << "   ";  // For the side space
+        if (col == 2) {
+            for (int j = 0; j < col; j++) {
+                cout << setw(2) << headers2[j] << " ";
+            }
+        } else if (col == 4) {
+            for (int j = 0; j < col; j++) {
+                cout << setw(2) << headers4[j] << " ";
+            }
         }
         cout << endl;
-    }
 
-}
+        // Print K-map with side labels
+        for (int i = 0; i < row; i++) {
+            // Print side label
+            if (row == 2) {
+                cout << headers2[i] << "  ";
+            } else if (row == 4) {
+                cout << headers4[i] << "  ";
+            }
+
+            // Print K-map row
+            for (int j = 0; j < col; j++) {
+                cout << setw(2) << kmap[i][j] << " ";
+            }
+            cout << endl;
+        }
+    }
 // to find minterms not in essential
 vector<int> get_minterms(vector<Implicant>v)
 {
@@ -925,203 +920,21 @@ void display_circuit(string expression) {
 
 }
 
-//we have two boolean functions that check if a row/column is dominated/dominating
-//which we call in their respective comparisons 
-bool isColumnDominating(Implicant imp1, Implicant imp2) //by comparing the binary representation for each implicant 
-{
-    const string& str1 = imp1.binary;
-    const string& str2 = imp2.binary;
 
-    for (size_t i = 0; i < str1.length(); i++) // check if the character in implicant1 is '1' and the character in implicant2 is '0'
+void print_nonessentialminterms(vector<int>a)
+{
+    if(!a.empty())
     {
-        if (str1[i] == '1' && str2[i] == '0') //if this is true this means it does not dominate 
+        for(int i=0; i<a.size(); i++)
         {
-            return false;
+            cout << a[i] << " ";
         }
     }
-
-    return true;//this means imp2 dominates imp1 
-}
-
-bool isRowDominated(const Implicant& imp1, const Implicant& imp2) //we can compare minterms here 
-{
-    for (int minterm1 : imp1.indicies) //loop through the first minterm and initialize the isCovered to false 
+    else
     {
-        bool isCovered = false;
-
-        for (int minterm2 : imp2.indicies) //loop through the second minterm we want to compare to the first minterm to check 
-        {//if they are both the same (aka covered) 
-            if (minterm1 == minterm2) //if both minterms are present in the same cover return true 
-            {
-                isCovered = true;
-                break;
-            }
-        }
-
-        if (!isCovered) {
-            return false; //if any minterm of imp1 is not covered by imp2 then imp1 is not dominated 
-        }
+        cout << "all the minterms are covered by essential!" << endl;
     }
-
-    return true;
 }
-
-vector<Implicant> eliminateDominatingColumns(vector<Implicant> pi) //gets the prime implicant vector from amal 
-{
-    vector<Implicant> result;
-    vector<bool> covered(pi.size(), false);
-
-    for (size_t i = 0; i < pi.size(); i++) //loop through each PI 
-    {
-        for (size_t j = i + 1; j < pi.size(); j++) //compare the current implicant with others 
-        {
-            if (!covered[j] && isColumnDominating(pi[i], pi[j])) //check if the PI we are on is dominating or not
-            {
-                covered[j] = true; //if it is, add it to vector covered
-            }
-        }
-    }
-
-    for (size_t i = 0; i < pi.size(); i++)  // collect the non-covered prime implicants as they are not dominated
-    {
-        if (!covered[i])
-        {
-            result.push_back(pi[i]);
-        }
-    }
-
-    return result;
-}
-
-vector<Implicant> eliminateDominatedRows(vector<Implicant> pi)// to loop through rows 
-{
-    vector<Implicant> result;
-
-    for (size_t i = 0; i < pi.size(); i++) {
-        bool isDominated = false;
-        for (size_t j = 0; j < pi.size(); j++) {
-            if (i != j && !pi[j].is_essential) {
-                if (isRowDominated(pi[i], pi[j])) {
-                    isDominated = true;
-                    break;
-                }
-            }
-        }
-
-        if (!isDominated)
-        {
-            result.push_back(pi[i]);
-        }
-    }
-
-    return result;
-}
-vector<Implicant> findEssentialPrimeImplicants_bonus(vector<Implicant>& implicants) //different function to return implicant not int
-{
-    map<int, int> mintermCounts;
-    vector<int> essentialMinterms;
-    vector<Implicant> essentialImplicants;
-
-    for (const Implicant& implicant : implicants) {
-        for (int index : implicant.indicies) {
-            if (mintermCounts.find(index) == mintermCounts.end()) {
-                mintermCounts[index] = 1;
-            }
-            else {
-                mintermCounts[index]++;
-            }
-        }
-    }
-
-    for (Implicant& implicant : implicants) {
-        bool isEssential = false;
-
-        for (int index : implicant.indicies) {
-            if (mintermCounts[index] == 1) {
-                isEssential = true;
-                essentialMinterms.push_back(index);
-            }
-        }
-
-        if (isEssential) {
-            implicant.is_essential = true; // Set is_essential flag to true
-            essentialImplicants.push_back(implicant);
-            //cout << "Essential Prime Implicant as Expression: " << binaryToExpression(implicant.binary) << endl;
-        }
-    }
-
-    return essentialImplicants;
-}
-
-vector<int> findUncoveredMinterms(const vector<int>& nano, const vector<Implicant>& primes) {
-    vector<int> p;
-    vector<int> print;
-    vector<int> essentialMinterms; 
-
-    for (const auto& it : primes) {
-        for (const auto& index : it.indicies) {
-            p.push_back(index);
-        }
-    }
-
-    // collect essential minterms
-    for (const auto& minterm : nano) {
-        if (find(p.begin(), p.end(), minterm) != p.end()) {
-            essentialMinterms.push_back(minterm);
-        }
-    }
-
-    for (const auto& item : p)//minterms not covered by essential pi  
-    {
-        if (find(nano.begin(), nano.end(), item) == nano.end() &&
-            find(essentialMinterms.begin(), essentialMinterms.end(), item) == essentialMinterms.end() &&
-            find(print.begin(), print.end(), item) == print.end()) {
-            print.push_back(item);
-        }
-    }
-
-    std::sort(print.begin(), print.end());
-    print.erase(std::unique(print.begin(), print.end()), print.end());
-
-    return print;
-}
-
-vector<Implicant> findNonEssentialPrimeImplicants(const vector<int>& essentialMinterms, const vector<Implicant>& primeImplicants) {
-    vector<Implicant> nonEssentialImplicants;
-
-    for (const Implicant& implicant : primeImplicants) {
-        bool isEssential = false;
-
-        // Check if the implicant is essential (covers an essential minterm)
-        for (int minterm : implicant.indicies) {
-            if (find(essentialMinterms.begin(), essentialMinterms.end(), minterm) != essentialMinterms.end()) {
-                isEssential = true;
-                break;
-            }
-        }
-
-        // If not essential, add the implicant to the non-essential list
-        if (!isEssential) {
-            nonEssentialImplicants.push_back(implicant);
-        }
-    }
-
-    return nonEssentialImplicants;
-}
-
-
-void printMinimizedExpression(const vector<Implicant>& primeImplicants) {
-    for (const Implicant& implicant : primeImplicants) {
-        if (implicant.is_essential) {
-            if (implicant.combine) {
-                cout << " + ";
-            }
-            cout << binaryToExpression(implicant.binary);
-        }
-    }
-    cout << endl;
-}
-
 int main()
 {
     string expression;
@@ -1133,67 +946,30 @@ int main()
 
     if (flag == true) {
         vector<Implicant> Tawfik = truth_table_generator(expression);
-        vector<int>minterms = get_minterms(Tawfik);
-
-
+        vector<int>minterms=get_minterms(Tawfik);
+        
+        
         vector<Implicant> primeImplicants = prime_Impicants(Tawfik);
-
-
-
+        
+        
+        
         cout << endl << endl;
         cout << "primeImplicants: " << endl;
         print_primeImplicants(primeImplicants);
-
-
+        
         vector<int> essentialMinterms = findEssentialPrimeImplicants(primeImplicants);
-
-        cout << "Minterms not covered by essential prime implicants: " << endl; 
-        print_minterms(essentialMinterms, primeImplicants); 
-
-        Kmaps_print(expression, essentialMinterms);
-
-        cout << '\n';
-
-
-        cout << "***********using bonus method: ***************" << endl;
-        vector<Implicant> essentialImplicants = findEssentialPrimeImplicants_bonus(primeImplicants);
-
-        cout << "Essential Prime Implicants' Minterms:" << endl;
-        for (const Implicant& implicant : essentialImplicants)
-        {
-            cout << "Is Essential: " << binaryToExpression(implicant.binary) << endl;
-        }
-
-        cout << endl;
-
-        vector<int> uncoveredMinterms = findUncoveredMinterms(essentialMinterms, primeImplicants);
-
-        cout << "Minterms not covered by Essential Prime Implicants: ";
-        for (int minterm : uncoveredMinterms) {
-            cout << minterm << " ";
-        }
-
-        cout << endl;
-        vector<Implicant> nonEssentialImplicants = findNonEssentialPrimeImplicants(essentialMinterms, primeImplicants);
-
-        cout << "Non-Essential Prime Implicants: " << endl;
-        for (const Implicant& implicant : nonEssentialImplicants) {
-            for (int index : implicant.binary) {
-                cout << binaryToExpression(implicant.binary) << " ";
-            }
-            cout << endl;
-        }
-
-        nonEssentialImplicants = eliminateDominatingColumns(nonEssentialImplicants);
-        printMinimizedExpression(nonEssentialImplicants);
-        cout << endl;
-
-        nonEssentialImplicants = eliminateDominatedRows(nonEssentialImplicants);
-        printMinimizedExpression(nonEssentialImplicants);
-
-        cout << endl;
-        printMinimizedExpression(nonEssentialImplicants); 
-
+        
+        cout<<"minterms not coverd by essentials:"<<endl;
+        
+        vector<int>m= mintermsnotcoveredbyessential(essentialMinterms, primeImplicants);
+        print_nonessentialminterms(m);
+        
+        Kmaps_print(expression, minterms);
+        
+        
+       
+        
+        
     }
    
 
