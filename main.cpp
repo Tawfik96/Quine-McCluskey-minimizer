@@ -1163,13 +1163,11 @@ int main()
         
         
        cout << '\n';
-       coverage_table(minterms, primeImplicants);
-        
+       //coverage_table(minterms, primeImplicants);
         
     }
-   
 
-    //display_circuit("a+b'");            //plug in the expression
+    display_circuit("a+b'");            //should take minimized boolean expression
 
     return 0;
 }
